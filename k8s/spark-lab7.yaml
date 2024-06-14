@@ -1,0 +1,38 @@
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  name: lab7
+  namespace: spark-operator
+spec:
+  type: Python
+  pythonVersion: "3"
+  mode: cluster
+  image: "bogdanliutikov/lab7:latest"
+  imagePullPolicy: Always
+  mainApplicationFile: "local:///app/src/main.py"
+  sparkVersion: "3.5.1"
+  restartPolicy:
+    type: OnFailure
+    onFailureRetries: 3
+    onFailureRetryInterval: 10
+    onSubmissionFailureRetries: 5
+    onSubmissionFailureRetryInterval: 20
+  deps:
+    jars: 
+      - "local:///app/jars/spark-cassandra-connector_2.12-3.1.0.jar"
+      - "local:///app/src/datamart/target/scala-2.12/datamart_2.12-0.1.jar"
+    packages:
+    - "com.datastax.spark:spark-cassandra-connector_2.12:3.1.0"
+  driver:
+    cores: 2
+    memory: "2g"
+    labels:
+      version: 3.5.1
+    serviceAccount: spark
+    javaOptions: "-Divy.cache.dir=/tmp -Divy.home=/tmp"
+  executor:
+    cores: 5
+    instances: 3
+    memory: "4g"
+    labels:
+      version: 3.5.1
